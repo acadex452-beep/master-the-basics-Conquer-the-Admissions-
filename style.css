@@ -1,0 +1,30 @@
+:root{--navy:#081626;--navy2:#10263d;--gold:#D4AF37;--white:#fff;--muted:#b8c3cf;--line:#263b50;--panel:#102238}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--navy);color:var(--white);font-family:Arial,Helvetica,sans-serif;line-height:1.6}
+a{color:inherit}
+.container{width:min(1100px,92%);margin:auto}
+header{background:linear-gradient(135deg,#081626,#132d48);border-bottom:1px solid var(--line);padding:22px 0}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.logo{font-size:1.45rem;font-weight:800;letter-spacing:2px;color:var(--gold);text-decoration:none}
+.tagline{color:var(--muted);font-size:.86rem}
+nav{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+nav a,.button{display:inline-block;text-decoration:none;border:1px solid #3b5064;border-radius:9px;padding:9px 13px;font-size:.92rem}
+nav a:hover,.button:hover{border-color:var(--gold);color:var(--gold)}
+.hero{padding:36px 0 24px}
+.eyebrow{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:.8rem}
+h1{font-size:clamp(2rem,6vw,3.3rem);line-height:1.12;margin:8px 0 12px}
+h2{font-size:1.45rem;margin:0 0 8px}
+h3{margin:0 0 6px}
+.intro{color:var(--muted);max-width:720px}
+.section{padding:22px 0 30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}
+.card p{color:var(--muted);margin:6px 0 14px;font-size:.94rem}
+.card .symbol{font-size:1.8rem;margin-bottom:6px}
+.button.gold{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:800}
+.button.small{font-size:.85rem;padding:7px 10px}
+.note{background:#0d2034;border-left:3px solid var(--gold);padding:13px 15px;border-radius:7px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.86rem;margin-top:20px}
+footer strong{color:var(--gold)}
+@media(max-width:520px){.brand{align-items:flex-start}.tagline{max-width:250px}nav a{padding:8px 10px}.card{padding:15px}}
