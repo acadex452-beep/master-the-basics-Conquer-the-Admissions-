@@ -32,4 +32,435 @@
       </article></div></section>
 </main>
 <footer><div class="container"><strong>ACADEX</strong> · Master the Basics. Conquer the Admissions.<br>Free study resources for medical admission aspirants.</div></footer>
+
+
+<!-- ACADEX INTERACTIVE VOCABULARY FLASHCARDS -->
+<section id="acadex-flashcards">
+  <div class="acfx-wrap">
+
+    <div class="acfx-heading">
+      <span class="acfx-kicker">ACADEX • ENGLISH VOCABULARY</span>
+      <h2>Synonym–Antonym Flashcards</h2>
+      <p>Master the word. Remember the meaning. Conquer the admissions.</p>
+    </div>
+
+    <div class="acfx-tools">
+      <input id="acfx-search" type="search"
+        placeholder="Search a word..." aria-label="Search vocabulary">
+      <select id="acfx-filter" aria-label="Filter flashcards">
+        <option value="all">All words</option>
+        <option value="new">Not reviewed</option>
+        <option value="known">I know these</option>
+        <option value="review">Review again</option>
+      </select>
+    </div>
+
+    <div class="acfx-progress">
+      <span id="acfx-count">Card 1 of 10</span>
+      <span id="acfx-score">Known: 0</span>
+    </div>
+    <div class="acfx-track"><div id="acfx-bar"></div></div>
+
+    <button type="button" class="acfx-card" id="acfx-card"
+      aria-label="Tap to reveal the answer" aria-pressed="false">
+      <span class="acfx-card-top">
+        <span id="acfx-category">WORD 01</span>
+        <span class="acfx-tap" id="acfx-tap">TAP TO REVEAL ↻</span>
+      </span>
+
+      <span class="acfx-word" id="acfx-word">INFALLIBLE</span>
+      <span class="acfx-pron" id="acfx-pron">ইনফ্যালিবল</span>
+
+      <span class="acfx-divider"></span>
+      <span class="acfx-hint" id="acfx-hint">
+        Can you recall its meaning, synonyms and antonyms?
+      </span>
+
+      <span class="acfx-answer" id="acfx-answer" hidden>
+        <span class="acfx-label">ENGLISH DEFINITION</span>
+        <span id="acfx-definition"></span>
+
+        <span class="acfx-label acfx-bangla-label">বাংলা অর্থ</span>
+        <span id="acfx-meaning"></span>
+
+        <span class="acfx-label acfx-syn-label">✓ SYNONYMS</span>
+        <span id="acfx-synonyms"></span>
+
+        <span class="acfx-label acfx-ant-label">✕ ANTONYMS</span>
+        <span id="acfx-antonyms"></span>
+      </span>
+
+      <span class="acfx-card-foot" id="acfx-foot">
+        Think first • Reveal later
+      </span>
+    </button>
+
+    <div class="acfx-actions">
+      <button type="button" class="acfx-btn acfx-secondary"
+        id="acfx-prev">← Previous</button>
+      <button type="button" class="acfx-btn acfx-primary"
+        id="acfx-reveal">Reveal Answer</button>
+      <button type="button" class="acfx-btn acfx-secondary"
+        id="acfx-next">Next →</button>
+    </div>
+
+    <div class="acfx-rating">
+      <p>After revealing the answer, choose your progress:</p>
+      <button type="button" class="acfx-btn acfx-known"
+        id="acfx-known">✓ I Know This</button>
+      <button type="button" class="acfx-btn acfx-review"
+        id="acfx-again">↻ Review Again</button>
+    </div>
+
+    <button type="button" class="acfx-shuffle" id="acfx-shuffle">
+      ⇄ Shuffle Words
+    </button>
+
+    <p class="acfx-note">
+      ACADEX • MASTER THE BASICS || CONQUER THE ADMISSIONS
+    </p>
+  </div>
+</section>
+
+<style>
+#acadex-flashcards {
+  --acfx-navy: #081626;
+  --acfx-blue: #173b5b;
+  --acfx-gold: #c9a227;
+  --acfx-green: #21835a;
+  --acfx-red: #c44747;
+  --acfx-paper: #f5f8fc;
+  --acfx-ink: #182536;
+  padding: 54px 16px;
+  background: var(--acfx-paper);
+  color: var(--acfx-ink);
+  font-family: inherit;
+}
+#acadex-flashcards * { box-sizing: border-box; }
+.acfx-wrap { max-width: 760px; margin: auto; }
+.acfx-heading { text-align: center; margin-bottom: 28px; }
+.acfx-kicker {
+  color: #947318; font-size: .75rem; font-weight: 800;
+  letter-spacing: 2px;
+}
+.acfx-heading h2 {
+  color: var(--acfx-navy); font-size: clamp(1.7rem,5vw,2.5rem);
+  line-height: 1.15; margin: 12px 0;
+}
+.acfx-heading p { color: #657386; line-height: 1.6; }
+.acfx-tools {
+  display: grid; grid-template-columns: 1fr 160px; gap: 10px;
+  margin-bottom: 20px;
+}
+.acfx-tools input, .acfx-tools select {
+  min-width: 0; width: 100%; padding: 12px;
+  border: 1px solid #d8e0ea; border-radius: 10px;
+  background: white; color: var(--acfx-ink); font: inherit;
+}
+.acfx-progress {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-size: .85rem; font-weight: 700; margin-bottom: 9px;
+}
+.acfx-track {
+  height: 6px; background: #dfe6ee; border-radius: 20px;
+  overflow: hidden; margin-bottom: 20px;
+}
+#acfx-bar {
+  height: 100%; width: 0%; background: var(--acfx-gold);
+  transition: width .2s ease;
+}
+.acfx-card {
+  display: flex; flex-direction: column; width: 100%;
+  min-height: 340px; padding: 23px;
+  text-align: left; color: var(--acfx-ink);
+  background: #fff; border: 1px solid #e0e7ef;
+  border-radius: 20px; box-shadow: 0 12px 32px #0816260c;
+  cursor: pointer; font: inherit;
+}
+.acfx-card:focus-visible, .acfx-btn:focus-visible,
+.acfx-shuffle:focus-visible {
+  outline: 3px solid #c9a227; outline-offset: 3px;
+}
+.acfx-card-top {
+  display: flex; justify-content: space-between; gap: 8px;
+  color: #6a7788; font-size: .7rem; font-weight: 800;
+  letter-spacing: 1px;
+}
+.acfx-tap { color: #967719; }
+.acfx-word {
+  display: block; margin-top: 34px; text-align: center;
+  color: var(--acfx-navy); font-size: clamp(1.9rem,7vw,3rem);
+  font-weight: 900; letter-spacing: 1px; overflow-wrap: anywhere;
+}
+.acfx-pron { display: block; text-align: center; margin-top: 8px; color: #68768a; }
+.acfx-divider {
+  height: 1px; background: #e4e9f0; margin: 23px 0;
+}
+.acfx-hint { text-align: center; color: #667487; line-height: 1.6; }
+.acfx-answer { display: flex; flex-direction: column; gap: 9px; margin-top: 5px; line-height: 1.6; }
+.acfx-answer[hidden] { display: none; }
+.acfx-label {
+  display: block; margin-top: 13px; font-size: .72rem;
+  font-weight: 900; letter-spacing: 1px; color: var(--acfx-blue);
+}
+.acfx-bangla-label { color: #947318; }
+.acfx-syn-label { color: var(--acfx-green); }
+.acfx-ant-label { color: var(--acfx-red); }
+.acfx-card-foot {
+  margin-top: auto; padding-top: 24px; text-align: center;
+  color: #8793a3; font-size: .75rem;
+}
+.acfx-actions {
+  display: grid; grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 9px; margin-top: 16px;
+}
+.acfx-btn {
+  border: 0; border-radius: 10px; padding: 12px 10px;
+  font: inherit; font-size: .88rem; font-weight: 800;
+  cursor: pointer;
+}
+.acfx-secondary { background: #e6ebf2; color: var(--acfx-navy); }
+.acfx-primary { background: var(--acfx-navy); color: white; }
+.acfx-rating { text-align: center; margin-top: 22px; }
+.acfx-rating p { font-size: .9rem; color: #657386; }
+.acfx-known { background: #e0f3e8; color: #176740; }
+.acfx-review { background: #fff0df; color: #8d5217; margin-left: 6px; }
+.acfx-shuffle {
+  display: block; margin: 18px auto 0; padding: 10px 15px;
+  background: white; border: 1px solid #dce3ec;
+  border-radius: 10px; color: var(--acfx-blue);
+  font: inherit; font-weight: 800; cursor: pointer;
+}
+.acfx-note {
+  text-align: center; font-size: .68rem; letter-spacing: 1px;
+  color: #8290a0; margin: 28px 0 0; line-height: 1.7;
+}
+.acfx-empty {
+  text-align: center; padding: 30px 12px; color: #68768a;
+}
+@media(max-width:520px) {
+  #acadex-flashcards { padding: 38px 12px; }
+  .acfx-tools { grid-template-columns: 1fr; }
+  .acfx-card { padding: 18px; min-height: 320px; }
+  .acfx-actions { grid-template-columns: 1fr 1fr; }
+  #acfx-reveal { grid-column: 1 / -1; grid-row: 1; }
+  .acfx-rating .acfx-btn { margin: 4px 2px; }
+}
+</style>
+
+<script>
+(function () {
+  const root = document.getElementById("acadex-flashcards");
+  if (!root || root.dataset.ready === "yes") return;
+  root.dataset.ready = "yes";
+
+  const cards = [
+    {
+      word: "INFALLIBLE", pron: "ইনফ্যালিবল",
+      definition: "Incapable of making mistakes or being wrong.",
+      meaning: "অভ্রান্ত, ভুলহীন, অব্যর্থ",
+      synonyms: "Faultless, flawless, perfect, unfailing",
+      antonyms: "Fallible, imperfect, faulty, errant"
+    },
+    {
+      word: "NOTORIOUS", pron: "নোটোরিয়াস",
+      definition: "Famous for something bad or undesirable.",
+      meaning: "কুখ্যাত, নিন্দিত",
+      synonyms: "Infamous, disreputable, ill-famed",
+      antonyms: "Reputable, respected, admirable"
+    },
+    {
+      word: "MEAGER", pron: "মিগার",
+      definition: "Lacking in quantity; too small or insufficient.",
+      meaning: "অল্প, অপ্রতুল, নগণ্য",
+      synonyms: "Scanty, sparse, paltry, inadequate",
+      antonyms: "Abundant, plentiful, ample, copious"
+    },
+    {
+      word: "INSIPID", pron: "ইনসিপিড",
+      definition: "Lacking flavor, interest or excitement.",
+      meaning: "নিরস, বিস্বাদ, একঘেয়ে",
+      synonyms: "Bland, tasteless, dull, vapid",
+      antonyms: "Flavorful, tasty, exciting, stimulating"
+    },
+    {
+      word: "INGENIOUS", pron: "ইনজিনিয়াস",
+      definition: "Clever, original and inventive.",
+      meaning: "উদ্ভাবনী, অত্যন্ত বুদ্ধিমান",
+      synonyms: "Inventive, creative, clever, resourceful",
+      antonyms: "Unimaginative, unoriginal, inept"
+    },
+    {
+      word: "LINGER", pron: "লিঙ্গার",
+      definition: "To stay longer than necessary; to remain.",
+      meaning: "দীর্ঘক্ষণ থাকা, দেরি করে থাকা",
+      synonyms: "Remain, stay, persist, loiter",
+      antonyms: "Leave, depart, rush, hasten"
+    },
+    {
+      word: "INDEFATIGABLE", pron: "ইনডেফ্যাটিগেবল",
+      definition: "Persisting tirelessly; never seeming to tire.",
+      meaning: "অক্লান্ত, শ্রান্তিহীন",
+      synonyms: "Tireless, unflagging, relentless, untiring",
+      antonyms: "Tired, weary, exhausted, lethargic"
+    },
+    {
+      word: "INQUISITIVE", pron: "ইনকুইজিটিভ",
+      definition: "Curious and eager to learn or know.",
+      meaning: "কৌতূহলী, অনুসন্ধিৎসু",
+      synonyms: "Curious, questioning, probing, investigative",
+      antonyms: "Uninterested, incurious, indifferent"
+    },
+    {
+      word: "IMPORTANT", pron: "ইমপোর্ট্যান্ট",
+      definition: "Having great significance or value.",
+      meaning: "গুরুত্বপূর্ণ, তাৎপর্যপূর্ণ",
+      synonyms: "Significant, crucial, essential, vital",
+      antonyms: "Trivial, insignificant, unimportant"
+    },
+    {
+      word: "INFINITESIMAL", pron: "ইনফিনিটেসিমাল",
+      definition: "Extremely small; almost immeasurably tiny.",
+      meaning: "অতি ক্ষুদ্র, অণুপরিমাণ",
+      synonyms: "Minuscule, microscopic, minute, tiny",
+      antonyms: "Enormous, massive, immense, colossal"
+    }
+  ];
+
+  const $ = id => document.getElementById("acfx-" + id);
+  let order = cards.map((_, i) => i);
+  let position = 0;
+  let revealed = false;
+  const status = {};
+
+  function currentIndex() { return order[position]; }
+  function currentCard() { return cards[currentIndex()]; }
+
+  function render() {
+    if (!order.length) {
+      $("card").hidden = true;
+      $("count").textContent = "No matching words";
+      $("score").textContent = "Known: " +
+        Object.values(status).filter(v => v === "known").length;
+      $("bar").style.width = "0%";
+      $("prev").disabled = true;
+      $("next").disabled = true;
+      $("reveal").disabled = true;
+      if (!$("empty")) {
+        const msg = document.createElement("p");
+        msg.id = "acfx-empty";
+        msg.className = "acfx-empty";
+        msg.textContent = "No words found. Try another search or filter.";
+        $("card").insertAdjacentElement("afterend", msg);
+      }
+      return;
+    }
+
+    $("card").hidden = false;
+    const empty = $("empty");
+    if (empty) empty.remove();
+
+    const c = currentCard();
+    $("category").textContent =
+      "WORD " + String(currentIndex() + 1).padStart(2, "0");
+    $("word").textContent = c.word;
+    $("pron").textContent = c.pron;
+    $("definition").textContent = c.definition;
+    $("meaning").textContent = c.meaning;
+    $("synonyms").textContent = c.synonyms;
+    $("antonyms").textContent = c.antonyms;
+
+    revealed = false;
+    $("answer").hidden = true;
+    $("hint").hidden = false;
+    $("foot").textContent = "Think first • Reveal later";
+    $("tap").textContent = "TAP TO REVEAL ↻";
+    $("card").setAttribute("aria-pressed", "false");
+    $("reveal").textContent = "Reveal Answer";
+    $("count").textContent = "Card " + (position + 1) + " of " + order.length;
+    $("score").textContent = "Known: " +
+      Object.values(status).filter(v => v === "known").length;
+    $("bar").style.width =
+      ((position + 1) / order.length * 100) + "%";
+    $("prev").disabled = position === 0;
+    $("next").disabled = position === order.length - 1;
+    $("known").textContent = status[currentIndex()] === "known"
+      ? "✓ Known" : "✓ I Know This";
+    $("again").textContent = status[currentIndex()] === "review"
+      ? "↻ Review Again" : "↻ Review Again";
+  }
+
+  function reveal() {
+    if (!order.length) return;
+    revealed = !revealed;
+    $("answer").hidden = !revealed;
+    $("hint").hidden = revealed;
+    $("tap").textContent = revealed ? "TAP TO HIDE ↑" : "TAP TO REVEAL ↻";
+    $("reveal").textContent = revealed ? "Hide Answer" : "Reveal Answer";
+    $("foot").textContent = revealed
+      ? "Now test your memory"
+      : "Think first • Reveal later";
+    $("card").setAttribute("aria-pressed", String(revealed));
+  }
+
+  function move(step) {
+    if (!order.length) return;
+    position = Math.max(0, Math.min(order.length - 1, position + step));
+    render();
+  }
+
+  function applyFilters() {
+    const q = $("search").value.trim().toLowerCase();
+    const filter = $("filter").value;
+    order = cards.map((c, i) => ({ c, i })).filter(({ c, i }) => {
+      const matches = [c.word, c.pron, c.definition, c.meaning,
+        c.synonyms, c.antonyms].join(" ").toLowerCase().includes(q);
+      const s = status[i] || "new";
+      return matches && (filter === "all" || s === filter);
+    }).map(item => item.i);
+    position = 0;
+    render();
+  }
+
+  $("card").addEventListener("click", reveal);
+  $("reveal").addEventListener("click", reveal);
+  $("prev").addEventListener("click", () => move(-1));
+  $("next").addEventListener("click", () => move(1));
+  $("search").addEventListener("input", applyFilters);
+  $("filter").addEventListener("change", applyFilters);
+
+  $("known").addEventListener("click", () => {
+    if (!order.length) return;
+    status[currentIndex()] = "known";
+    if ($("filter").value !== "all" && $("filter").value !== "known") {
+      applyFilters();
+    } else {
+      render();
+    }
+  });
+
+  $("again").addEventListener("click", () => {
+    if (!order.length) return;
+    status[currentIndex()] = "review";
+    if ($("filter").value !== "all" && $("filter").value !== "review") {
+      applyFilters();
+    } else {
+      render();
+    }
+  });
+
+  $("shuffle").addEventListener("click", () => {
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    position = 0;
+    render();
+  });
+
+  render();
+})();
+</script>
+<!-- END ACADEX INTERACTIVE VOCABULARY FLASHCARDS -->
+  
 </body></html>
