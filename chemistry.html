@@ -1,35 +1,173 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ACADEX | Chemistry Hub</title><meta name="description" content="ACADEX Chemistry Hub free study resources for medical admission.">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACADEX | Chemistry Hub</title>
+  <meta name="description" content="ACADEX Chemistry Hub for marked books, extra information and medical admission resources.">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      padding: 25px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(8,22,38,.06);
+    }
+    .resource-icon { font-size: 32px; margin-bottom: 14px; }
+    .resource-card h3 { margin: 0 0 10px; color: #081626; font-size: 21px; }
+    .resource-card p { color: #596579; line-height: 1.7; flex-grow: 1; }
+    .resource-btn {
+      display: block;
+      margin-top: 15px;
+      padding: 14px 16px;
+      border-radius: 9px;
+      background: #081626;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+    .resource-btn:hover { background: #1f3a5f; transform: translateY(-2px); }
+    .extra-btn { background: #d4af37; color: #081626; }
+    .extra-btn:hover { background: #c9a227; color: #081626; }
+    .resource-label {
+      color: #9a7920;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .video-frame {
+      position: relative;
+      padding-top: 56.25%;
+      margin: 16px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #081626;
+    }
+    .video-frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
 </head>
+
 <body>
-<header><div class="container">
-  <div class="brand"><a class="logo" href="index.html">ACADEX</a><div class="tagline">MASTER THE BASICS. CONQUER THE ADMISSIONS.</div></div>
-  <nav><a href="index.html">Home</a>
-<a href="biology.html">Biology</a>
-<a href="chemistry.html">Chemistry</a>
-<a href="physics.html">Physics</a>
-<a href="gk.html">GK Weapon</a>
-<a href="english.html">English</a></nav>
-</div></header>
+<header>
+  <div class="container">
+    <div class="brand">
+      <a class="logo" href="index.html">ACADEX</a>
+      <div class="tagline">MASTER THE BASICS. CONQUER THE ADMISSIONS.</div>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="biology.html">Biology</a>
+      <a href="chemistry.html">Chemistry</a>
+      <a href="physics.html">Physics</a>
+      <a href="gk.html">GK Weapon</a>
+      <a href="english.html">English</a>
+    </nav>
+  </div>
+</header>
+
 <main class="container">
-  <section class="hero"><div class="eyebrow">ACADEX SUBJECT HUB</div><h1>🧪 Chemistry Hub</h1><p class="intro">Concepts • Reactions • Chapter-wise Practice</p></section>
-  <section class="section" id="pdfs"><h2>📚 PDF Books &amp; Notes</h2><p class="intro">Open the study-material folder to view available PDFs.</p>
-    <div class="grid"><article class="card"><div class="symbol">📂</div><h3>Chemistry Hub Resources</h3><p>PDF books, notes, guidelines and question banks.</p><a class="button gold" href="https://drive.google.com/drive/folders/1LgqQAYdJXvduFp0mKjUqKtFsimrQQD2R" target="_blank" rel="noopener noreferrer">Open PDF Folder ↗</a></article></div>
-    <p class="note">Note: This starter version uses your current Drive folder link. For separate subject folders, replace this link with the matching subject-specific Google Drive folder URL.</p>
+  <section class="hero">
+    <div class="eyebrow">ACADEX SUBJECT HUB</div>
+    <h1>⚗️ Chemistry Hub</h1>
+    <p class="intro">
+      Master chemical concepts, revise important textbook content
+      and strengthen your medical admission preparation.
+    </p>
   </section>
-  <section class="section" id="videos"><h2>▶️ YouTube Video Library</h2><p class="intro">Watch selected ACADEX study videos.</p><div class="grid">
-      <article class="card">
-        <div class="symbol">▶️</div><h3>Physics & Chemistry for Medical Admission</h3>
-        <p>ACADEX video resource.</p>
-        <div style="position:relative;padding-top:56.25%;margin:12px 0;border-radius:10px;overflow:hidden">
-          <iframe src="https://www.youtube.com/embed/MtVYTA7AikU" title="Physics & Chemistry for Medical Admission" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </div>
-        <a class="button small" href="https://www.youtube.com/watch?v=MtVYTA7AikU" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a>
-      </article></div></section>
+
+  <section class="section" id="pdfs">
+    <h2>📚 PDF Books &amp; Notes</h2>
+    <p class="intro">
+      Choose your study resource and access its Google Drive folder.
+    </p>
+
+    <div class="resource-grid">
+      <article class="resource-card">
+        <div class="resource-icon">📖</div>
+        <div class="resource-label">RESOURCE 01</div>
+        <h3>Marked Books</h3>
+        <p>
+          Important marked textbook content for focused reading
+          and quick revision.
+        </p>
+        <a class="resource-btn"
+           href="https://drive.google.com/drive/folders/1LgqQAYdJXvduFp0mKjUqKtFsimrQQD2R"
+           target="_blank" rel="noopener noreferrer">
+          OPEN MARKED BOOKS ↗
+        </a>
+      </article>
+
+      <article class="resource-card">
+        <div class="resource-icon">💡</div>
+        <div class="resource-label">RESOURCE 02</div>
+        <h3>Extra Information</h3>
+        <p>
+          Additional facts and study materials to support
+          Medical Admission Test preparation.
+        </p>
+        <a class="resource-btn extra-btn"
+           href="https://drive.google.com/drive/folders/1jgEr2eNxE60Mj4qnZdMkr8FDnG7kPILj"
+           target="_blank" rel="noopener noreferrer">
+          OPEN EXTRA INFORMATION ↗
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="videos">
+    <h2>▶️ YouTube Video Library</h2>
+    <p class="intro">
+      Watch selected ACADEX videos to support your preparation.
+    </p>
+
+    <article class="card">
+      <div class="symbol">▶️</div>
+      <h3>Physics and Chemistry Guidelines</h3>
+      <p>ACADEX study resource.</p>
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube.com/embed/MtVYTA7AikU"
+          title="ACADEX Physics and Chemistry Guidelines"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <a class="button small"
+         href="https://www.youtube.com/watch?v=MtVYTA7AikU"
+         target="_blank" rel="noopener noreferrer">
+        WATCH ON YOUTUBE ↗
+      </a>
+    </article>
+  </section>
 </main>
-<footer><div class="container"><strong>ACADEX</strong> · Master the Basics. Conquer the Admissions.<br>Free study resources for medical admission aspirants.</div></footer>
-</body></html>
+
+<footer>
+  <div class="container">
+    <strong>ACADEX</strong> · Master the Basics. Conquer the Admissions.
+    <br>
+    Free study resources for medical admission preparation.
+  </div>
+</footer>
+</body>
+</html>
