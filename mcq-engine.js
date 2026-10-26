@@ -52,7 +52,7 @@
     answers = {};
     finished = false;
     review = false;
-    render();
+    renderQuestion();
     }
 
   function getScore() {
