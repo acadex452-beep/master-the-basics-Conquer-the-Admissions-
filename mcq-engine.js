@@ -45,7 +45,7 @@
     return copy;
   }
 
-  function startQuiz(selectedMode) {
+    function startQuiz(selectedMode) {
     mode = selectedMode;
     questions = shuffle(filteredQuestions);
     current = 0;
@@ -53,7 +53,7 @@
     finished = false;
     review = false;
     render();
-  }
+    }
 
   function getScore() {
     return questions.reduce(function (score, q) {
