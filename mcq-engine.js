@@ -69,16 +69,21 @@ function getWrongCount() {
 }
 
 function getScore() {
-  const correct = getCorrectCount();
-  const wrong = getWrongCount();
+  const correct = questions.filter(function (q) {
+    return answers[q.id] === q.answer;
+  }).length;
 
-  if (mode === "practice") {
-    return correct;
-  }
+  const wrong = questions.filter(function (q) {
+    return answers[q.id] !== undefined &&
+           answers[q.id] !== q.answer;
+  }).length;
 
   if (mode === "exam") {
     return correct - wrong * 0.25;
   }
+
+  return correct;
+}
 
   return correct;
 }
