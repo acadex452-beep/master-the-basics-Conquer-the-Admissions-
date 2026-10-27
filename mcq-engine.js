@@ -318,16 +318,10 @@ function getScore() {
   }
 
   function renderResults() {
-  
-const score = getScore();
-const correctCount = getCorrectCount();
-const wrongCount = getWrongCount();
-const total = questions.length;
-const unanswered = total - getAnsweredCount();
-const percentage = total
-  ? Math.round((score / total) * 100)
-  : 0;
-
+    const score = getScore();
+    const total = questions.length;
+    const unanswered = total - getAnsweredCount();
+    const percentage = total ? Math.round((score / total) * 100) : 0;
 
     app.innerHTML = `
       <div class="mcq-shell">
