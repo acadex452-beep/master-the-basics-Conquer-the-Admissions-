@@ -69,17 +69,19 @@ function getWrongCount() {
 }
 
 function getScore() {
+  const correct = getCorrectCount();
+  const wrong = getWrongCount();
+
+  if (mode === "practice") {
+    return correct;
+  }
+
   if (mode === "exam") {
-    return getCorrectCount() - getWrongCount() * 0.25;
+    return correct - wrong * 0.25;
   }
 
-  return getCorrectCount();
+  return correct;
 }
-
-
-  function getAnsweredCount() {
-    return Object.keys(answers).length;
-  }
 
   function renderHome() {
     const subjectName = SUBJECT === "All"
