@@ -342,17 +342,17 @@ const percentage = total
           <h1>${mode === "exam" ? "Exam Results" : "Practice Results"}</h1>
 
           <div class="mcq-score-circle">
-            <strong>${score}/${total}</strong>
+            <strong>${score.toFixed(2)}/${total}</strong>
             <span>${percentage}% Score</span>
           </div>
 
           <div class="mcq-stats">
             <div>
-              <strong>${score}</strong>
+              <strong>${correctCount}</strong>
               <span>Correct</span>
             </div>
             <div>
-              <strong>${total - score - unanswered}</strong>
+              <strong>${wrongCount}</strong>
               <span>Incorrect</span>
             </div>
             <div>
