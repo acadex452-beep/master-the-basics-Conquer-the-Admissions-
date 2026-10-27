@@ -146,17 +146,16 @@ function getScore() {
     `;
 
     document.getElementById("practiceBtn").addEventListener(
-      "click", function () {
-        startQuiz("practice");
-      }
-    );
-
-    document.getElementById("examBtn").addEventListener(
-      "click", function () {
-        startQuiz("exam");
-      }
-    );
+  "click", function () {
+    startQuiz("practice");
   }
+);
+
+document.getElementById("examBtn").addEventListener(
+  "click", function () {
+    startQuiz("exam");
+  }
+);
 
   function renderQuestion() {
     const q = questions[current];
