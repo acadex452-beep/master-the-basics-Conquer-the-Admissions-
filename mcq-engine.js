@@ -164,50 +164,57 @@ function getScore() {
     );
   }
 
-  
-function renderQuestion() {
-  const isPractice = mode === "practice";
-
-  // PRACTICE MODE: আগের মতো একটি প্রশ্ন
-  if (isPractice) {
+  function renderQuestion() {
     const q = questions[current];
     const selected = answers[q.id];
     const answered = selected !== undefined;
+    const isPractice = mode === "practice";
 
     const optionsHTML = q.options.map(function (option, index) {
       let classes = "mcq-option";
 
-      if (answered) {
+      if (answered && isPractice) {
         if (index === q.answer) classes += " correct";
         else if (index === selected) classes += " incorrect";
+      } else if (answered && index === selected) {
+        classes += " selected";
       }
 
-      const disabled = finished || answered ? "disabled" : "";
+      const disabled = finished ||
+        (isPractice && answered) ? "disabled" : "";
 
       return `
         <button class="${classes}" data-option="${index}" ${disabled}>
           <span class="mcq-option-letter">
             ${String.fromCharCode(65 + index)}
           </span>
-          <span class="mcq-option-text">${escapeHTML(option)}</span>
+          <span class="mcq-option-text">
+            ${escapeHTML(option)}
+          </span>
         </button>
       `;
     }).join("");
 
     let explanationHTML = "";
 
-    if (answered) {
+    if (isPractice && answered) {
       const correct = selected === q.answer;
 
       explanationHTML = `
         <div class="mcq-explanation ${correct ? "success" : "error"}">
-          <strong>${correct ? "✓ Correct Answer!" : "✗ Not quite right"}</strong>
-          <p><b>Answer:</b> ${escapeHTML(q.options[q.answer])}</p>
+          <strong>
+            ${correct ? "✓ Correct Answer!" : "✗ Not quite right"}
+          </strong>
+          <p>
+            <b>Answer:</b>
+            ${escapeHTML(q.options[q.answer])}
+          </p>
           <p>${escapeHTML(q.explanation)}</p>
         </div>
       `;
     }
 
+    const previousDisabled = current === 0 ? "disabled" : "";
     const lastQuestion = current === questions.length - 1;
 
     app.innerHTML = `
@@ -219,7 +226,9 @@ function renderQuestion() {
 
         <section class="mcq-quiz-card">
           <div class="mcq-quiz-top">
-            <span class="mcq-chip">PRACTICE MODE</span>
+            <span class="mcq-chip">
+              ${mode === "practice" ? "PRACTICE MODE" : "EXAM MODE"}
+            </span>
             <span class="mcq-counter">
               Question ${current + 1} of ${questions.length}
             </span>
@@ -237,16 +246,24 @@ function renderQuestion() {
           </div>
 
           <h2 class="mcq-question">${escapeHTML(q.question)}</h2>
+
           <div class="mcq-options">${optionsHTML}</div>
+
           ${explanationHTML}
 
           <div class="mcq-navigation">
             <button class="mcq-secondary-btn" id="prevBtn"
-              ${current === 0 ? "disabled" : ""}>← Previous</button>
+              ${previousDisabled}>← Previous</button>
 
-            <button class="mcq-primary-btn" id="nextBtn">
-              ${lastQuestion ? "View Results" : "Next Question →"}
-            </button>
+            ${
+              lastQuestion
+                ? `<button class="mcq-primary-btn" id="nextBtn">
+                     ${mode === "exam" ? "Finish Exam" : "View Results"}
+                   </button>`
+                : `<button class="mcq-primary-btn" id="nextBtn">
+                     Next Question →
+                   </button>`
+            }
           </div>
         </section>
 
@@ -271,6 +288,20 @@ function renderQuestion() {
       if (current < questions.length - 1) {
         current++;
         renderQuestion();
+      } else if (mode === "exam" && !finished) {
+        const unanswered = questions.length - getAnsweredCount();
+
+        if (unanswered > 0) {
+          const confirmFinish = window.confirm(
+            "You have " + unanswered +
+            " unanswered question(s). Finish the exam anyway?"
+          );
+          if (!confirmFinish) return;
+        }
+
+        finished = true;
+        review = false;
+        renderResults();
       } else {
         finished = true;
         renderResults();
@@ -282,47 +313,25 @@ function renderQuestion() {
         renderHome();
       }
     });
-
-    return;
   }
 
-  // EXAM MODE: সব প্রশ্ন একই পেজে
-  const navigatorHTML = questions.map(function (q, index) {
-    const answered = answers[q.id] !== undefined;
-    const active = index === current;
+  function selectAnswer(optionIndex) {
+    if (finished) return;
 
-    return `
-      <button type="button"
-        class="mcq-nav-number ${answered ? "answered" : "unanswered"} ${active ? "active" : ""}"
-        data-jump="${index}"
-        aria-label="Go to question ${index + 1}">
-        ${index + 1}
-      </button>
-    `;
-  }).join("");
+    const q = questions[current];
+    if (mode === "practice" && answers[q.id] !== undefined) return;
 
-  const allQuestionsHTML = questions.map(function (q, index) {
-    const selected = answers[q.id];
+    answers[q.id] = optionIndex;
 
-    const optionsHTML = q.options.map(function (option, optionIndex) {
-function renderQuestion() {
-const q = questions[current];
-const selected = answers[q.id];
-const answered = selected !== undefined;
-const isPractice = mode === "practice";
+    if (mode === "practice") {
+      renderQuestion();
+    } else {
+      renderQuestion();
+    }
+  }
 
-const optionsHTML = q.options.map(function (option, index) { let classes = "mcq-option"; if (answered && isPractice) { if (index === q.answer) classes += " correct"; else if (index === selected) classes += " incorrect"; } else if (answered && index === selected) { classes += " selected"; } const disabled = finished || (isPractice && answered) ? "disabled" : ""; return ` <button class="${classes}" data-option="${index}" ${disabled}> <span class="mcq-option-letter"> ${String.fromCharCode(65 + index)} </span> <span class="mcq-option-text"> ${escapeHTML(option)} </span> </button> `; }).join(""); let explanationHTML = ""; if (isPractice && answered) { const correct = selected === q.answer; explanationHTML = ` <div class="mcq-explanation ${correct ? "success" : "error"}"> <strong> ${correct ? "✓ Correct Answer!" : "✗ Not quite right"} </strong> <p> <b>Answer:</b> ${escapeHTML(q.options[q.answer])} </p> <p>${escapeHTML(q.explanation)}</p> </div> `; } const previousDisabled = current === 0 ? "disabled" : ""; const lastQuestion = current === questions.length - 1; app.innerHTML = ` <div class="mcq-shell"> <header class="mcq-header"> <a class="mcq-brand" href="index.html">ACADEX</a> <button class="mcq-text-btn" id="exitBtn">Exit Quiz</button> </header> <section class="mcq-quiz-card"> <div class="mcq-quiz-top"> <span class="mcq-chip"> ${mode === "practice" ? "PRACTICE MODE" : "EXAM MODE"} </span> <span class="mcq-counter"> Question ${current + 1} of ${questions.length} </span> </div> <div class="mcq-progress-track"> <div class="mcq-progress-fill" style="width:${((current + 1) / questions.length) * 100}%"> </div> </div> <div class="mcq-meta"> <span>${escapeHTML(q.subject)}</span> <span>${getAnsweredCount()} answered</span> </div> <h2 class="mcq-question">${escapeHTML(q.question)}</h2> <div class="mcq-options">${optionsHTML}</div> ${explanationHTML} <div class="mcq-navigation"> <button class="mcq-secondary-btn" id="prevBtn" ${previousDisabled}>← Previous</button> ${ lastQuestion ? `<button class="mcq-primary-btn" id="nextBtn"> ${mode === "exam" ? "Finish Exam" : "View Results"} </button>` : `<button class="mcq-primary-btn" id="nextBtn"> Next Question → </button>` } </div> </section> <p class="mcq-footer">ACADEX · Learn. Practise. Improve.</p> </div> `; app.querySelectorAll("[data-option]").forEach(function (button) { button.addEventListener("click", function () { selectAnswer(Number(button.dataset.option)); }); }); document.getElementById("prevBtn").addEventListener("click", function () { if (current > 0) { current--; renderQuestion(); } }); document.getElementById("nextBtn").addEventListener("click", function () { if (current < questions.length - 1) { current++; renderQuestion(); } else if (mode === "exam" && !finished) { const unanswered = questions.length - getAnsweredCount(); if (unanswered > 0) { const confirmFinish = window.confirm( "You have " + unanswered + " unanswered question(s). Finish the exam anyway?" ); if (!confirmFinish) return; } finished = true; review = false; renderResults(); } else { finished = true; renderResults(); } }); document.getElementById("exitBtn").addEventListener("click", function () { if (window.confirm("Exit this quiz? Your current progress will reset.")) { renderHome(); } }); 
-
-}
-
-function selectAnswer(optionIndex) {
-if (finished) return;
-
-const q = questions[current]; if (mode === "practice" && answers[q.id] !== undefined) return; answers[q.id] = optionIndex; if (mode === "practice") { renderQuestion(); } else { renderQuestion(); } 
-
-}
-
-function renderResults() {
+  function renderResults() {
+  
 
 const score = getScore();
 const correctCount = getCorrectCount();
@@ -330,33 +339,178 @@ const wrongCount = getWrongCount();
 const total = questions.length;
 const unanswered = total - getAnsweredCount();
 const percentage = total
-? Math.round((score / total) * 100)
-: 0;
+  ? Math.round((score / total) * 100)
+  : 0;
 
-app.innerHTML = ` <div class="mcq-shell"> <header class="mcq-header"> <a class="mcq-brand" href="index.html">ACADEX</a> <span class="mcq-tag">SESSION COMPLETE</span> </header> <section class="mcq-result-card"> <div class="mcq-result-symbol">✓</div> <p class="mcq-eyebrow">YOUR PERFORMANCE</p> <h1>${mode === "exam" ? "Exam Results" : "Practice Results"}</h1> <div class="mcq-score-circle"> <strong>${score}/${total}</strong> <span>${percentage}% Score</span> </div> <div class="mcq-stats"> <div> <strong>${score}</strong> <span>Correct</span> </div> <div> <strong>${total - score - unanswered}</strong> <span>Incorrect</span> </div> <div> <strong>${unanswered}</strong> <span>Unanswered</span> </div> </div> <p class="mcq-muted"> ${percentage >= 80 ? "Excellent work! Keep strengthening your basics." : percentage >= 50 ? "Good effort. Review the explanations and try again." : "Keep practising. Every attempt is a chance to improve."} </p> <div class="mcq-result-actions"> <button class="mcq-primary-btn" id="reviewBtn"> Review Answers </button> <button class="mcq-secondary-btn" id="retryBtn"> Try Again </button> <button class="mcq-secondary-btn" id="homeBtn"> Back to MCQ Home </button> </div> </section> <p class="mcq-footer">ACADEX · Master the Basics.</p> </div> `; document.getElementById("reviewBtn").addEventListener("click", function () { review = true; current = 0; renderReview(); }); document.getElementById("retryBtn").addEventListener("click", function () { startQuiz(mode); }); document.getElementById("homeBtn").addEventListener("click", renderHome); 
 
-}
 
-function renderReview() {
-const q = questions[current];
-const selected = answers[q.id];
-const isCorrect = selected === q.answer;
 
-const optionsHTML = q.options.map(function (option, index) { let classes = "mcq-option"; if (index === q.answer) classes += " correct"; else if (index === selected) classes += " incorrect"; return ` <div class="${classes}"> <span class="mcq-option-letter"> ${String.fromCharCode(65 + index)} </span> <span class="mcq-option-text">${escapeHTML(option)}</span> </div> `; }).join(""); app.innerHTML = ` <div class="mcq-shell"> <header class="mcq-header"> <a class="mcq-brand" href="index.html">ACADEX</a> <button class="mcq-text-btn" id="resultsBtn">Results</button> </header> <section class="mcq-quiz-card"> <div class="mcq-quiz-top"> <span class="mcq-chip">ANSWER REVIEW</span> <span class="mcq-counter">${current + 1} / ${questions.length}</span> </div> <h2 class="mcq-question">${escapeHTML(q.question)}</h2> <div class="mcq-options">${optionsHTML}</div> <div class="mcq-explanation ${isCorrect ? "success" : "error"}"> <strong>${selected === undefined ? "Not Answered" : isCorrect ? "✓ Correct" : "✗ Incorrect"}</strong> <p><b>Correct answer:</b> ${escapeHTML(q.options[q.answer])}</p> <p>${escapeHTML(q.explanation)}</p> </div> <div class="mcq-navigation"> <button class="mcq-secondary-btn" id="reviewPrev" ${current === 0 ? "disabled" : ""}>← Previous</button> <button class="mcq-primary-btn" id="reviewNext"> ${current === questions.length - 1 ? "Finish Review" : "Next →"} </button> </div> </section> </div> `; document.getElementById("resultsBtn").addEventListener("click", renderResults); document.getElementById("reviewPrev").addEventListener("click", function () { if (current > 0) { current--; renderReview(); } }); document.getElementById("reviewNext").addEventListener("click", function () { if (current < questions.length - 1) { current++; renderReview(); } else { renderResults(); } }); 
+    app.innerHTML = `
+      <div class="mcq-shell">
+        <header class="mcq-header">
+          <a class="mcq-brand" href="index.html">ACADEX</a>
+          <span class="mcq-tag">SESSION COMPLETE</span>
+        </header>
 
-}
+        <section class="mcq-result-card">
+          <div class="mcq-result-symbol">✓</div>
+          <p class="mcq-eyebrow">YOUR PERFORMANCE</p>
+          <h1>${mode === "exam" ? "Exam Results" : "Practice Results"}</h1>
 
-if (!QUESTIONS.length) {
-app.innerHTML = <div class="mcq-shell"> <h1>ACADEX MCQ</h1> <p>Questions could not be loaded.</p> <p>Check that questions.js is committed and loaded before mcq-engine.js.</p> </div> ;
-return;
-}
+          <div class="mcq-score-circle">
+            <strong>${score}/${total}</strong>
+            <span>${percentage}% Score</span>
+          </div>
 
-if (!filteredQuestions.length) {
-app.innerHTML = <div class="mcq-shell"> <h1>No questions found</h1> <p>Check the subject name in this page's data-subject attribute.</p> </div> ;
-return;
-}
+          <div class="mcq-stats">
+            <div>
+              <strong>${score}</strong>
+              <span>Correct</span>
+            </div>
+            <div>
+              <strong>${total - score - unanswered}</strong>
+              <span>Incorrect</span>
+            </div>
+            <div>
+              <strong>${unanswered}</strong>
+              <span>Unanswered</span>
+            </div>
+          </div>
 
-renderHome();
-})()
+          <p class="mcq-muted">
+            ${percentage >= 80
+              ? "Excellent work! Keep strengthening your basics."
+              : percentage >= 50
+                ? "Good effort. Review the explanations and try again."
+                : "Keep practising. Every attempt is a chance to improve."}
+          </p>
 
-    
+          <div class="mcq-result-actions">
+            <button class="mcq-primary-btn" id="reviewBtn">
+              Review Answers
+            </button>
+            <button class="mcq-secondary-btn" id="retryBtn">
+              Try Again
+            </button>
+            <button class="mcq-secondary-btn" id="homeBtn">
+              Back to MCQ Home
+            </button>
+          </div>
+        </section>
+
+        <p class="mcq-footer">ACADEX · Master the Basics.</p>
+      </div>
+    `;
+
+    document.getElementById("reviewBtn").addEventListener("click", function () {
+      review = true;
+      current = 0;
+      renderReview();
+    });
+
+    document.getElementById("retryBtn").addEventListener("click", function () {
+      startQuiz(mode);
+    });
+
+    document.getElementById("homeBtn").addEventListener("click", renderHome);
+  }
+
+  function renderReview() {
+    const q = questions[current];
+    const selected = answers[q.id];
+    const isCorrect = selected === q.answer;
+
+    const optionsHTML = q.options.map(function (option, index) {
+      let classes = "mcq-option";
+
+      if (index === q.answer) classes += " correct";
+      else if (index === selected) classes += " incorrect";
+
+      return `
+        <div class="${classes}">
+          <span class="mcq-option-letter">
+            ${String.fromCharCode(65 + index)}
+          </span>
+          <span class="mcq-option-text">${escapeHTML(option)}</span>
+        </div>
+      `;
+    }).join("");
+
+    app.innerHTML = `
+      <div class="mcq-shell">
+        <header class="mcq-header">
+          <a class="mcq-brand" href="index.html">ACADEX</a>
+          <button class="mcq-text-btn" id="resultsBtn">Results</button>
+        </header>
+
+        <section class="mcq-quiz-card">
+          <div class="mcq-quiz-top">
+            <span class="mcq-chip">ANSWER REVIEW</span>
+            <span class="mcq-counter">${current + 1} / ${questions.length}</span>
+          </div>
+
+          <h2 class="mcq-question">${escapeHTML(q.question)}</h2>
+
+          <div class="mcq-options">${optionsHTML}</div>
+
+          <div class="mcq-explanation ${isCorrect ? "success" : "error"}">
+            <strong>${selected === undefined
+              ? "Not Answered"
+              : isCorrect ? "✓ Correct" : "✗ Incorrect"}</strong>
+            <p><b>Correct answer:</b> ${escapeHTML(q.options[q.answer])}</p>
+            <p>${escapeHTML(q.explanation)}</p>
+          </div>
+
+          <div class="mcq-navigation">
+            <button class="mcq-secondary-btn" id="reviewPrev"
+              ${current === 0 ? "disabled" : ""}>← Previous</button>
+            <button class="mcq-primary-btn" id="reviewNext">
+              ${current === questions.length - 1 ? "Finish Review" : "Next →"}
+            </button>
+          </div>
+        </section>
+      </div>
+    `;
+
+    document.getElementById("resultsBtn").addEventListener("click", renderResults);
+
+    document.getElementById("reviewPrev").addEventListener("click", function () {
+      if (current > 0) {
+        current--;
+        renderReview();
+      }
+    });
+
+    document.getElementById("reviewNext").addEventListener("click", function () {
+      if (current < questions.length - 1) {
+        current++;
+        renderReview();
+      } else {
+        renderResults();
+      }
+    });
+  }
+
+  if (!QUESTIONS.length) {
+    app.innerHTML = `
+      <div class="mcq-shell">
+        <h1>ACADEX MCQ</h1>
+        <p>Questions could not be loaded.</p>
+        <p>Check that questions.js is committed and loaded before mcq-engine.js.</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (!filteredQuestions.length) {
+    app.innerHTML = `
+      <div class="mcq-shell">
+        <h1>No questions found</h1>
+        <p>Check the subject name in this page's data-subject attribute.</p>
+      </div>
+    `;
+    return;
+  }
+
+  renderHome();
+})();
