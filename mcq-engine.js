@@ -69,12 +69,14 @@ function getWrongCount() {
 }
 
 function getScore() {
-  const correct = getCorrectCount();
-  const wrong = getWrongCount();
+  const correct = questions.filter(function (q) {
+    return answers[q.id] === q.answer;
+  }).length;
 
-  if (mode === "practice") {
-    return correct;
-  }
+  const wrong = questions.filter(function (q) {
+    return answers[q.id] !== undefined &&
+           answers[q.id] !== q.answer;
+  }).length;
 
   if (mode === "exam") {
     return correct - wrong * 0.25;
@@ -83,6 +85,8 @@ function getScore() {
   return correct;
 }
 
+  return correct;
+}
 
   function renderHome() {
     const subjectName = SUBJECT === "All"
@@ -146,16 +150,17 @@ function getScore() {
     `;
 
     document.getElementById("practiceBtn").addEventListener(
-  "click", function () {
-    startQuiz("practice");
-  }
-);
+      "click", function () {
+        startQuiz("practice");
+      }
+    );
 
-document.getElementById("examBtn").addEventListener(
-  "click", function () {
-    startQuiz("exam");
+    document.getElementById("examBtn").addEventListener(
+      "click", function () {
+        startQuiz("exam");
+      }
+    );
   }
-);
 
   function renderQuestion() {
     const q = questions[current];
