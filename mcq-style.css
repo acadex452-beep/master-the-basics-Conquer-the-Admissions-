@@ -519,3 +519,87 @@ button.mcq-option:hover:not(:disabled) {
     font-size: 22px;
   }
 }
+
+
+/* ACADEX Exam Mode Question Navigator */
+.mcq-question-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  margin: 18px 0;
+}
+
+.mcq-nav-number {
+  min-height: 42px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #222;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mcq-nav-number.answered {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+.mcq-nav-number.active {
+  outline: 3px solid #2563eb;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+.mcq-exam-list {
+  display: grid;
+  gap: 16px;
+  scroll-margin-top: 12px;
+}
+
+.mcq-exam-question {
+  scroll-margin-top: 12px;
+}
+
+.mcq-nav-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #555;
+}
+
+.mcq-nav-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mcq-legend-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.answered-dot {
+  background: #16a34a;
+}
+
+.unanswered-dot {
+  background: #d1d5db;
+}
+
+.active-dot {
+  background: #2563eb;
+}
+
+.mcq-exam-navigator {
+  position: relative;
+}
+
+@media (max-width: 360px) {
+  .mcq-question-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
