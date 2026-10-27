@@ -333,13 +333,14 @@ function getScore() {
   function renderResults() {
   
 const score = getScore();
+
 const correctCount = getCorrectCount();
 const wrongCount = getWrongCount();
-const total = questions.length;
-const unanswered = total - getAnsweredCount();
-const percentage = total
-  ? Math.round((score / total) * 100)
-  : 0;
+
+const score = mode === "exam"
+  ? correctCount - wrongCount * 0.25
+  : correctCount;
+
 
 
     app.innerHTML = `
