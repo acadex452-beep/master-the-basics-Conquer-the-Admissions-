@@ -55,11 +55,23 @@
     renderQuestion();
     }
 
-  function getScore() {
-    return questions.reduce(function (score, q) {
-      return score + (answers[q.id] === q.answer ? 1 : 0);
-    }, 0);
-  }
+function getCorrectCount() {
+  return questions.filter(function (q) {
+    return answers[q.id] === q.answer;
+  }).length;
+}
+
+function getWrongCount() {
+  return questions.filter(function (q) {
+    return answers[q.id] !== undefined &&
+           answers[q.id] !== q.answer;
+  }).length;
+}
+
+function getScore() {
+  return getCorrectCount() - getWrongCount() * 0.25;
+}
+
 
   function getAnsweredCount() {
     return Object.keys(answers).length;
