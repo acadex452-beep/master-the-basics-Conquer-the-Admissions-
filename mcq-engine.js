@@ -156,9 +156,11 @@
     });
   }
 
-  // PRACTICE MODE: একটি প্রশ্ন, Previous ও Next
+  // PRACTICE MODE: one question at a time
   function renderPracticeQuestion() {
     const q = questions[current];
+    if (!q) return;
+
     const selected = answers[q.id];
     const answered = selected !== undefined;
 
@@ -252,6 +254,7 @@
       if (current > 0) {
         current--;
         renderQuestion();
+        window.scrollTo(0, 0);
       }
     });
 
@@ -259,33 +262,22 @@
       if (current < questions.length - 1) {
         current++;
         renderQuestion();
+        window.scrollTo(0, 0);
       } else {
         finished = true;
         renderResults();
+        window.scrollTo(0, 0);
       }
     });
 
     document.getElementById("exitBtn").addEventListener("click", confirmExit);
   }
 
-  // EXAM MODE: সব প্রশ্ন একই পেজে
-  function renderExamQuestion() {
-    const navigatorHTML = questions.map(function (q, index) {
-      const answered = answers[q.id] !== undefined;
-      const active = index === current;
-
-      return `
-        <button type="button"
-          class="mcq-nav-number ${answered ? "answered" : "unanswered"} ${active ? "active" : ""}"
-          data-jump="${index}"
-          aria-label="Go to question ${index + 1}">
-          ${index + 1}
-        </button>
-      `;
-    }).join("");
-
+  // EXAM MODE: all questions, then navigator, then submit
+  function renderExamQuestion(scrollToIndex) {
     const allQuestionsHTML = questions.map(function (q, index) {
       const selected = answers[q.id];
+      const answered = selected !== undefined;
 
       const optionsHTML = q.options.map(function (option, optionIndex) {
         const isSelected = selected === optionIndex;
@@ -310,7 +302,7 @@
           <div class="mcq-quiz-top">
             <span class="mcq-chip">QUESTION ${index + 1}</span>
             <span class="mcq-counter">
-              ${selected !== undefined ? "Answered" : "Not answered"}
+              ${answered ? "Answered" : "Not answered"}
             </span>
           </div>
 
@@ -324,6 +316,20 @@
       `;
     }).join("");
 
+    const navigatorHTML = questions.map(function (q, index) {
+      const answered = answers[q.id] !== undefined;
+      const active = index === current;
+
+      return `
+        <button type="button"
+          class="mcq-nav-number ${answered ? "answered" : "unanswered"} ${active ? "active" : ""}"
+          data-jump="${index}"
+          aria-label="Go to question ${index + 1}">
+          ${index + 1}
+        </button>
+      `;
+    }).join("");
+
     app.innerHTML = `
       <div class="mcq-shell">
         <header class="mcq-header">
@@ -331,7 +337,12 @@
           <button class="mcq-text-btn" id="exitBtn">Exit Exam</button>
         </header>
 
-        <section class="mcq-quiz-card mcq-exam-navigator">
+        <div class="mcq-exam-list">
+          ${allQuestionsHTML}
+        </div>
+
+        <!-- Navigator moved below all questions -->
+        <section class="mcq-quiz-card mcq-exam-navigator" id="questionNavigator">
           <div class="mcq-quiz-top">
             <span class="mcq-chip">EXAM MODE</span>
             <span class="mcq-counter">
@@ -359,12 +370,9 @@
           </div>
         </section>
 
-        <div class="mcq-exam-list">
-          ${allQuestionsHTML}
-        </div>
-
         <section class="mcq-quiz-card">
-          <button class="mcq-primary-btn" id="submitExamBtn">
+          <button class="mcq-primary-btn" id="submitExamBtn"
+            ${finished ? "disabled" : ""}>
             Submit Exam
           </button>
         </section>
@@ -376,21 +384,8 @@
     app.querySelectorAll("[data-jump]").forEach(function (button) {
       button.addEventListener("click", function () {
         const targetIndex = Number(button.dataset.jump);
-        const target = document.getElementById("exam-question-" + targetIndex);
-
         current = targetIndex;
-        renderExamQuestion();
-
-        const updatedTarget = document.getElementById(
-          "exam-question-" + targetIndex
-        );
-
-        if (updatedTarget) {
-          updatedTarget.scrollIntoView({
-            behavior: "auto",
-            block: "start"
-          });
-        }
+        renderExamQuestion(targetIndex);
       });
     });
 
@@ -426,9 +421,21 @@
     });
 
     document.getElementById("exitBtn").addEventListener("click", confirmExit);
+
+    // If a navigator number was clicked, scroll to that question.
+    if (scrollToIndex !== undefined) {
+      const target = document.getElementById("exam-question-" + scrollToIndex);
+
+      if (target) {
+        target.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+      }
+    }
   }
 
-  function renderQuestion() {
+  function renderQuestion(scrollToIndex) {
     if (!questions.length) {
       renderHome();
       return;
@@ -437,7 +444,7 @@
     if (mode === "practice") {
       renderPracticeQuestion();
     } else {
-      renderExamQuestion();
+      renderExamQuestion(scrollToIndex);
     }
   }
 
@@ -446,7 +453,8 @@
 
     const q = questions[current];
 
-    if (!q || !q.options || optionIndex < 0 || optionIndex >= q.options.length) {
+    if (!q || !q.options ||
+        optionIndex < 0 || optionIndex >= q.options.length) {
       return;
     }
 
@@ -460,18 +468,7 @@
       renderQuestion();
     } else {
       const questionIndex = current;
-      renderQuestion();
-
-      const target = document.getElementById(
-        "exam-question-" + questionIndex
-      );
-
-      if (target) {
-        target.scrollIntoView({
-          behavior: "auto",
-          block: "start"
-        });
-      }
+      renderQuestion(questionIndex);
     }
   }
 
@@ -635,12 +632,14 @@
 
     document.getElementById("resultsBtn").addEventListener("click", function () {
       renderResults();
+      window.scrollTo(0, 0);
     });
 
     document.getElementById("reviewPrev").addEventListener("click", function () {
       if (current > 0) {
         current--;
         renderReview();
+        window.scrollTo(0, 0);
       }
     });
 
@@ -648,8 +647,10 @@
       if (current < questions.length - 1) {
         current++;
         renderReview();
+        window.scrollTo(0, 0);
       } else {
         renderResults();
+        window.scrollTo(0, 0);
       }
     });
   }
