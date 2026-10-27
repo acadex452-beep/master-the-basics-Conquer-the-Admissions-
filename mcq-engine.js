@@ -69,7 +69,11 @@ function getWrongCount() {
 }
 
 function getScore() {
-  return getCorrectCount() - getWrongCount() * 0.25;
+  if (mode === "exam") {
+    return getCorrectCount() - getWrongCount() * 0.25;
+  }
+
+  return getCorrectCount();
 }
 
 
