@@ -332,7 +332,6 @@ function getScore() {
 
   function renderResults() {
   
-const score = getScore();
 
 const correctCount = getCorrectCount();
 const wrongCount = getWrongCount();
