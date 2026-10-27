@@ -69,19 +69,13 @@ function getWrongCount() {
 }
 
 function getScore() {
-  const correct = getCorrectCount();
-  const wrong = getWrongCount();
-
-  if (mode === "practice") {
-    return correct;
-  }
-
-  if (mode === "exam") {
-    return correct - wrong * 0.25;
-  }
-
-  return correct;
+  return getCorrectCount() - getWrongCount() * 0.25;
 }
+
+
+  function getAnsweredCount() {
+    return Object.keys(answers).length;
+  }
 
   function renderHome() {
     const subjectName = SUBJECT === "All"
@@ -348,17 +342,17 @@ const percentage = total
           <h1>${mode === "exam" ? "Exam Results" : "Practice Results"}</h1>
 
           <div class="mcq-score-circle">
-            <strong>${score.toFixed(2)}/${total}</strong>
+            <strong>${score}/${total}</strong>
             <span>${percentage}% Score</span>
           </div>
 
           <div class="mcq-stats">
             <div>
-              <strong>${correctCount}</strong>
+              <strong>${score}</strong>
               <span>Correct</span>
             </div>
             <div>
-              <strong>${wrongCount}</strong>
+              <strong>${total - score - unanswered}</strong>
               <span>Incorrect</span>
             </div>
             <div>
