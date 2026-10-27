@@ -69,14 +69,12 @@ function getWrongCount() {
 }
 
 function getScore() {
-  const correct = questions.filter(function (q) {
-    return answers[q.id] === q.answer;
-  }).length;
+  const correct = getCorrectCount();
+  const wrong = getWrongCount();
 
-  const wrong = questions.filter(function (q) {
-    return answers[q.id] !== undefined &&
-           answers[q.id] !== q.answer;
-  }).length;
+  if (mode === "practice") {
+    return correct;
+  }
 
   if (mode === "exam") {
     return correct - wrong * 0.25;
@@ -85,8 +83,6 @@ function getScore() {
   return correct;
 }
 
-  return correct;
-}
 
   function renderHome() {
     const subjectName = SUBJECT === "All"
