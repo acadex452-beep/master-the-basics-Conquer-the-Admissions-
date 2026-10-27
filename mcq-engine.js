@@ -68,9 +68,22 @@ function getWrongCount() {
   }).length;
 }
 
+
 function getScore() {
-  return getCorrectCount() - getWrongCount() * 0.25;
+  const correct = getCorrectCount();
+  const wrong = getWrongCount();
+
+  if (mode === "practice") {
+    return correct;
+  }
+
+  if (mode === "exam") {
+    return correct - wrong * 0.25;
+  }
+
+  return correct;
 }
+  
 
 
   function getAnsweredCount() {
