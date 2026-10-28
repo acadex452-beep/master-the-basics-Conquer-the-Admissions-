@@ -1,5 +1,3 @@
-HTML
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,12 +41,12 @@ footer{text-align:center;padding:20px;color:#555}
   </p>
 
   <label for="csvFile">Upload CSV file</label>
-  <input id="csvFile" type="file" accept=".csv,text/csv">
+  <input id="csvFile" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain">
 
   <p class="note" id="fileInfo">No file selected.</p>
 
   <label for="sheetData">Or paste the complete table here</label>
-  <textarea id="sheetData" placeholder="id    subject    question    optionA ..."></textarea>
+  <textarea id="sheetData" placeholder="id,subject,question,optionA,optionB,optionC,optionD,answer,explanation"></textarea>
 
   <label for="existingIds">Existing question IDs (optional, one per line)</label>
   <textarea id="existingIds" style="min-height:85px"
@@ -91,7 +89,8 @@ const headers = [
   "id","subject","question","optionA","optionB",
   "optionC","optionD","answer","explanation"
 ];
-let importedText = "";
+const expected = headers.map(h => h.toLowerCase());
+const INVISIBLE = /[\u200B-\u200D\u2060\uFEFF\u00A0]/g;
 let generated = "";
 
 function report(message, isError){
@@ -99,61 +98,102 @@ function report(message, isError){
   $("status").className = isError ? "error" : "ok";
 }
 
+// Normalise a header cell: remove invisible chars, spaces, quotes, case.
+function normHeader(h){
+  return String(h)
+    .replace(INVISIBLE, "")
+    .replace(/\s+/g, "")
+    .replace(/^["'“”‘’]+|["'“”‘’]+$/g, "")
+    .toLowerCase();
+}
+
+// Clean cell text: remove zero-width chars and trim.
+function cleanCell(s){
+  return s.replace(/[\u200B-\u200D\u2060\uFEFF]/g, "").replace(/\u00A0/g, " ").trim();
+}
+
+function detectDelimiter(line){
+  // Count candidates outside quotes in the first line; pick the most frequent.
+  const counts = {",":0, "\t":0, ";":0};
+  let q = false;
+  for(const ch of line){
+    if(ch === '"') q = !q;
+    else if(!q && ch in counts) counts[ch]++;
+  }
+  let best = ",", max = -1;
+  for(const d of [",","\t",";"]){
+    if(counts[d] > max){ max = counts[d]; best = d; }
+  }
+  return best;
+}
+
 function parseDelimited(text, delimiter){
-  // Handles quoted CSV cells, including commas inside questions
-  // and escaped double quotes.
   const rows = [];
   let row = [], cell = "", quoted = false;
 
-  text = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
-
   for(let i=0;i<text.length;i++){
     const ch = text[i];
-
     if(ch === '"'){
-      if(quoted && text[i+1] === '"'){
-        cell += '"';
-        i++;
-      } else {
-        quoted = !quoted;
-      }
+      if(quoted && text[i+1] === '"'){ cell += '"'; i++; }
+      else quoted = !quoted;
     } else if(ch === delimiter && !quoted){
-      row.push(cell.trim());
-      cell = "";
+      row.push(cleanCell(cell)); cell = "";
     } else if(ch === "\n" && !quoted){
-      row.push(cell.trim());
+      row.push(cleanCell(cell));
       if(row.some(v => v !== "")) rows.push(row);
-      row = [];
-      cell = "";
+      row = []; cell = "";
     } else {
       cell += ch;
     }
   }
 
-  if(quoted) throw new Error("CSV-তে বন্ধ না হওয়া quotation mark আছে।");
-  row.push(cell.trim());
+  if(quoted) throw new Error("CSV-তে বন্ধ না হওয়া quotation mark আছে।");
+  row.push(cleanCell(cell));
   if(row.some(v => v !== "")) rows.push(row);
   return rows;
 }
 
-function parseInput(text){
-  text = text.replace(/^\uFEFF/, "").trim();
-  if(!text) throw new Error("কোনো ডেটা পাওয়া যায়নি।");
+function dropTrailingEmpty(row, minLen){
+  const r = row.slice();
+  while(r.length > minLen && r[r.length-1] === "") r.pop();
+  return r;
+}
 
-  const firstLine = text.split(/\r?\n/)[0];
-  // A copied Sheets table usually contains tabs.
-  // CSV files usually use commas.
-  const delimiter = firstLine.includes("\t") ? "\t" : ",";
-  return parseDelimited(text, delimiter);
+function parseInput(text){
+  text = text.replace(INVISIBLE, function(m, off){
+    // strip invisible chars only at the very start of the text here;
+    // the rest is cleaned per-cell.
+    return off === 0 ? "" : m;
+  });
+  text = text.replace(/\r\n?/g, "\n").trim();
+  if(!text) throw new Error("কোনো ডেটা পাওয়া যায়নি।");
+
+  let lines = text.split("\n");
+  // Excel sometimes adds "sep=," as the first line.
+  if(/^\s*sep\s*=/i.test(lines[0])) lines.shift();
+  // Skip leading blank lines.
+  while(lines.length && !lines[0].trim()) lines.shift();
+  if(!lines.length) throw new Error("কোনো ডেটা পাওয়া যায়নি।");
+
+  const delimiter = detectDelimiter(lines[0]);
+  let rows = parseDelimited(lines.join("\n"), delimiter);
+
+  // Find the header row within the first 5 rows (starts with "id").
+  let h = rows.findIndex((r,i) => i < 5 && normHeader(r[0]||"") === "id");
+  if(h < 0) h = 0;
+  rows = rows.slice(h);
+
+  // Remove empty trailing columns (e.g. ",,," from Sheets).
+  rows = rows.map((r,i) => dropTrailingEmpty(r, headers.length));
+  return rows;
 }
 
 $("csvFile").addEventListener("change", async function(){
   const file = this.files && this.files[0];
   if(!file) return;
-
   try{
-    importedText = await file.text();
-    $("sheetData").value = importedText;
+    const text = await file.text();
+    $("sheetData").value = text;
     $("fileInfo").textContent =
       "Loaded: " + file.name + " (" + file.size + " bytes).";
     report("CSV loaded. Now select Validate & Generate.", false);
@@ -174,12 +214,14 @@ function validate(){
     return;
   }
 
-  const actualHeaders = rows[0].map(h => h.trim().toLowerCase());
-  if(actualHeaders.length !== headers.length ||
-     headers.some((h,i) => actualHeaders[i] !== h)){
+  const actual = rows[0].map(normHeader);
+  if(actual.length !== expected.length ||
+     expected.some((h,i) => actual[i] !== h)){
     report(
       "ERROR: The first row must contain these 9 headers in order:\n" +
       headers.join(" | ") +
+      "\n\nFound (" + rows[0].length + " columns):\n" +
+      rows[0].map(x => JSON.stringify(x)).join(" | ") +
       "\n\nTip: export the correct sheet as CSV and upload it again.",
       true
     );
@@ -268,7 +310,6 @@ $("clearBtn").addEventListener("click", function(){
   $("existingIds").value = "";
   $("output").value = "";
   $("fileInfo").textContent = "No file selected.";
-  importedText = "";
   generated = "";
   report("Inputs cleared.", false);
 });
