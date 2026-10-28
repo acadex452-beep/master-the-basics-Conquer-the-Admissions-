@@ -356,8 +356,12 @@ window.ACADEX_QUESTIONS = [
     options: ["Phenomenons", "Phenomenas", "Phenomena", "Phenomenae"],
     answer: 2,
     explanation: "Phenomena is the standard plural of phenomenon."
+  },
+  {
+    id: 50, subject: "English",
+    question: "Choose the correct preposition: 'She is interested ___ biology.'",
+    options: ["on", "at", "in", "for"],
+    answer: 2,
+    explanation: "The correct collocation is 'interested in'."
   }
-  
-
 ];
-
