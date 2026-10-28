@@ -356,78 +356,8 @@ window.ACADEX_QUESTIONS = [
     options: ["Phenomenons", "Phenomenas", "Phenomena", "Phenomenae"],
     answer: 2,
     explanation: "Phenomena is the standard plural of phenomenon."
-  },
-  {
-    id: 50, subject: "English",
-    question: "Choose the correct preposition: 'She is interested ___ biology.'",
-    options: ["on", "at", "in", "for"],
-    answer: 2,
-    explanation: "The correct collocation is 'interested in'."
-  },
-    {
-    "id": "GK_001",
-    "subject": "GK",
-    "question": "বাংলাদেশের রাজধানী কোনটি?",
-    "options": [
-      "ঢাকা",
-      "চট্টগ্রাম",
-      "খুলনা",
-      "রাজশাহী"
-    ],
-    "answer": 0,
-    "explanation": "ঢাকা বাংলাদেশের রাজধানী।"
-  },
-  {
-    "id": "BIO_001",
-    "subject": "BIO",
-    "question": "কোষের শক্তিঘর বলা হয় কোন অঙ্গাণুকে?",
-    "options": [
-      "রাইবোজোম",
-      "মাইটোকন্ড্রিয়া",
-      "গলজি বডি",
-      "লাইসোজোম"
-    ],
-    "answer": 1,
-    "explanation": "মাইটোকন্ড্রিয়া ATP উৎপাদনের প্রধান স্থান।"
-  },
-  {
-    "id": "CHEM_001",
-    "subject": "CHEM",
-    "question": "পানির রাসায়নিক সংকেত কোনটি?",
-    "options": [
-      "H₂O",
-      "CO₂",
-      "O₂",
-      "NaCl"
-    ],
-    "answer": 0,
-    "explanation": "পানির একটি অণুতে দুইটি হাইড্রোজেন ও একটি অক্সিজেন পরমাণু থাকে।"
-  },
-  {
-    "id": "PHY_001",
-    "subject": "PHY",
-    "question": "বলের SI একক কোনটি?",
-    "options": [
-      "জুল",
-      "ওয়াট",
-      "নিউটন",
-      "পাস্কাল"
-    ],
-    "answer": 2,
-    "explanation": "বলের SI একক নিউটন (N)।"
-  },
-  {
-    "id": "ENG_001",
-    "subject": "ENG",
-    "question": "Choose the synonym of 'abundant'.",
-    "options": [
-      "Scarce",
-      "Plentiful",
-      "Weak",
-      "Empty"
-    ],
-    "answer": 1,
-    "explanation": "'Plentiful' means available in large quantities."
-      }
+  }
+  
+
 ];
 
