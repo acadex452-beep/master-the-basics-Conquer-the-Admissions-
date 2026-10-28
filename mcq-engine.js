@@ -22,7 +22,6 @@
   let current = 0;
   let answers = {};
   let finished = false;
-  let review = false;
 
   function escapeHTML(value) {
     return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
@@ -53,7 +52,7 @@
     current = 0;
     answers = {};
     finished = false;
-    review = false;
+
     renderQuestion();
     window.scrollTo(0, 0);
   }
@@ -104,9 +103,7 @@
           <p class="mcq-subtitle">
             Practice smarter. Test yourself. Master the basics.
           </p>
-          <div class="mcq-subject-label">
-            ${escapeHTML(subjectName)}
-          </div>
+          <div class="mcq-subject-label">${escapeHTML(subjectName)}</div>
         </section>
 
         <section class="mcq-start-card">
@@ -341,7 +338,6 @@
           ${allQuestionsHTML}
         </div>
 
-        <!-- Navigator moved below all questions -->
         <section class="mcq-quiz-card mcq-exam-navigator" id="questionNavigator">
           <div class="mcq-quiz-top">
             <span class="mcq-chip">EXAM MODE</span>
@@ -408,21 +404,17 @@
         );
 
         if (!confirmed) return;
-      } else {
-        if (!window.confirm("Are you sure you want to submit the exam?")) {
-          return;
-        }
+      } else if (!window.confirm("Are you sure you want to submit the exam?")) {
+        return;
       }
 
       finished = true;
-      review = false;
       renderResults();
       window.scrollTo(0, 0);
     });
 
     document.getElementById("exitBtn").addEventListener("click", confirmExit);
 
-    // If a navigator number was clicked, scroll to that question.
     if (scrollToIndex !== undefined) {
       const target = document.getElementById("exam-question-" + scrollToIndex);
 
@@ -467,8 +459,7 @@
     if (mode === "practice") {
       renderQuestion();
     } else {
-      const questionIndex = current;
-      renderQuestion(questionIndex);
+      renderQuestion(current);
     }
   }
 
@@ -477,7 +468,6 @@
       current = 0;
       answers = {};
       finished = false;
-      review = false;
       renderHome();
       window.scrollTo(0, 0);
     }
@@ -511,18 +501,9 @@
           </div>
 
           <div class="mcq-stats">
-            <div>
-              <strong>${correctCount}</strong>
-              <span>Correct</span>
-            </div>
-            <div>
-              <strong>${wrongCount}</strong>
-              <span>Incorrect</span>
-            </div>
-            <div>
-              <strong>${unanswered}</strong>
-              <span>Unanswered</span>
-            </div>
+            <div><strong>${correctCount}</strong><span>Correct</span></div>
+            <div><strong>${wrongCount}</strong><span>Incorrect</span></div>
+            <div><strong>${unanswered}</strong><span>Unanswered</span></div>
           </div>
 
           <p class="mcq-muted">
@@ -549,9 +530,13 @@
     `;
 
     document.getElementById("reviewBtn").addEventListener("click", function () {
-      review = true;
-      current = 0;
-      renderReview();
+      if (mode === "exam") {
+        renderFullExamReview();
+      } else {
+        current = 0;
+        renderReview();
+      }
+
       window.scrollTo(0, 0);
     });
 
@@ -565,6 +550,154 @@
     });
   }
 
+  // EXAM MODE REVIEW: all questions, answers and explanations on one page
+  function renderFullExamReview() {
+    const reviewHTML = questions.map(function (q, index) {
+      const selected = answers[q.id];
+      const isAnswered = selected !== undefined;
+      const isCorrect = isAnswered && selected === q.answer;
+
+      const optionsHTML = q.options.map(function (option, optionIndex) {
+        let classes = "mcq-option";
+
+        if (optionIndex === q.answer) {
+          classes += " correct";
+        } else if (isAnswered && optionIndex === selected) {
+          classes += " incorrect";
+        }
+
+        let label = "";
+
+        if (optionIndex === q.answer) {
+          label = '<span class="mcq-review-label">Correct answer</span>';
+        } else if (isAnswered && optionIndex === selected) {
+          label = '<span class="mcq-review-label">Your answer</span>';
+        }
+
+        return `
+          <div class="${classes}">
+            <span class="mcq-option-letter">
+              ${String.fromCharCode(65 + optionIndex)}
+            </span>
+            <span class="mcq-option-text">${escapeHTML(option)}</span>
+            ${label}
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <section class="mcq-quiz-card mcq-exam-question"
+          id="review-question-${index}">
+
+          <div class="mcq-quiz-top">
+            <span class="mcq-chip">QUESTION ${index + 1}</span>
+            <span class="mcq-counter">
+              ${
+                !isAnswered
+                  ? "Unanswered"
+                  : isCorrect
+                    ? "Correct"
+                    : "Incorrect"
+              }
+            </span>
+          </div>
+
+          <div class="mcq-meta">
+            <span>${escapeHTML(q.subject)}</span>
+          </div>
+
+          <h2 class="mcq-question">${escapeHTML(q.question)}</h2>
+          <div class="mcq-options">${optionsHTML}</div>
+
+          <div class="mcq-explanation ${isCorrect ? "success" : "error"}">
+            <strong>
+              ${
+                !isAnswered
+                  ? "Not Answered"
+                  : isCorrect
+                    ? "✓ Correct Answer"
+                    : "✗ Incorrect Answer"
+              }
+            </strong>
+
+            <p><b>Correct answer:</b>
+              ${escapeHTML(q.options[q.answer])}
+            </p>
+
+            ${
+              isAnswered
+                ? `<p><b>Your answer:</b> ${escapeHTML(q.options[selected])}</p>`
+                : '<p>You did not select an answer.</p>'
+            }
+
+            <p>${escapeHTML(q.explanation || "No explanation available.")}</p>
+          </div>
+        </section>
+      `;
+    }).join("");
+
+    const score = getScore();
+    const total = questions.length;
+    const percentage = total ? Math.round(score / total * 100) : 0;
+
+    app.innerHTML = `
+      <div class="mcq-shell">
+        <header class="mcq-header">
+          <a class="mcq-brand" href="index.html">ACADEX</a>
+          <button class="mcq-text-btn" id="backToResultsBtn">Results</button>
+        </header>
+
+        <section class="mcq-result-card">
+          <p class="mcq-eyebrow">COMPLETE EXAM REVIEW</p>
+          <h1>All Answers & Explanations</h1>
+
+          <div class="mcq-score-circle">
+            <strong>${Number(score.toFixed(2))}/${total}</strong>
+            <span>${percentage}% Score</span>
+          </div>
+
+          <div class="mcq-stats">
+            <div><strong>${getCorrectCount()}</strong><span>Correct</span></div>
+            <div><strong>${getWrongCount()}</strong><span>Incorrect</span></div>
+            <div>
+              <strong>${total - getAnsweredCount()}</strong>
+              <span>Unanswered</span>
+
+ </div>
+          </div>
+
+          <p class="mcq-muted">
+            Correct answers are green. Incorrect selections are red.
+          </p>
+        </section>
+
+        <div class="mcq-exam-list">
+          ${reviewHTML}
+        </div>
+
+        <section class="mcq-quiz-card">
+          <button class="mcq-primary-btn" id="backToResultsBottomBtn">
+            Back to Results
+          </button>
+        </section>
+
+        <p class="mcq-footer">ACADEX · Master the Basics.</p>
+      </div>
+    `;
+
+    function goBackToResults() {
+      renderResults();
+      window.scrollTo(0, 0);
+    }
+
+    document.getElementById("backToResultsBtn")
+      .addEventListener("click", goBackToResults);
+
+    document.getElementById("backToResultsBottomBtn")
+      .addEventListener("click", goBackToResults);
+  }
+
+  // PRACTICE MODE REVIEW: one question at a time
   function renderReview() {
     const q = questions[current];
 
@@ -574,14 +707,15 @@
     }
 
     const selected = answers[q.id];
-    const isCorrect = selected === q.answer;
+    const isAnswered = selected !== undefined;
+    const isCorrect = isAnswered && selected === q.answer;
 
     const optionsHTML = q.options.map(function (option, index) {
       let classes = "mcq-option";
 
       if (index === q.answer) {
         classes += " correct";
-      } else if (index === selected) {
+      } else if (isAnswered && index === selected) {
         classes += " incorrect";
       }
 
@@ -612,10 +746,21 @@
           <div class="mcq-options">${optionsHTML}</div>
 
           <div class="mcq-explanation ${isCorrect ? "success" : "error"}">
-            <strong>${selected === undefined
-              ? "Not Answered"
-              : isCorrect ? "✓ Correct" : "✗ Incorrect"}</strong>
+            <strong>
+              ${
+                !isAnswered
+                  ? "Not Answered"
+                  : isCorrect
+                    ? "✓ Correct"
+                    : "✗ Incorrect"
+              }
+            </strong>
             <p><b>Correct answer:</b> ${escapeHTML(q.options[q.answer])}</p>
+            ${
+              isAnswered
+                ? `<p><b>Your answer:</b> ${escapeHTML(q.options[selected])}</p>`
+                : "<p>You did not select an answer.</p>"
+            }
             <p>${escapeHTML(q.explanation || "No explanation available.")}</p>
           </div>
 
