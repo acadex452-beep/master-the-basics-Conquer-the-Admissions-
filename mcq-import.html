@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACADEX | MCQ Bulk Import</title>
+<style>
+:root {
+  --navy: #081626;
+  --gold: #c9a227;
+  --paper: #fafaf8;
+  --ink: #222;
+  --red: #b42318;
+  --green: #167647;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 Arial, sans-serif;
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 22px 16px;
+  border-bottom: 4px solid var(--gold);
+}
+header h1 { margin: 0; font-size: 25px; }
+header p { margin: 4px 0 0; color: #ddd; }
+main { max-width: 900px; margin: auto; padding: 18px; }
+.panel {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+h2 { font-size: 19px; margin-top: 0; }
+label { display: block; font-weight: bold; margin: 12px 0 6px; }
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 180px;
+  padding: 12px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  font: 14px/1.5 monospace;
+}
+#existingIds { min-height: 90px; }
+button {
+  background: var(--navy);
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin: 8px 6px 0 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+button.secondary { background: #e9edf2; color: var(--ink); }
+button.gold { background: var(--gold); color: #111; }
+.note { color: #555; font-size: 14px; }
+#status { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ok { color: var(--green); }
+.error { color: var(--red); }
+#output { min-height: 260px; }
+footer { text-align: center; padding: 20px; color: #555; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ACADEX MCQ BULK IMPORT</h1>
+  <p>Master the Basics. Conquer the Admissions.</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Step 1 — Paste Google Sheets data</h2>
+    <p class="note">
+      Copy the 9 columns from id through explanation.
+      First row must be the header. Do not include line breaks
+      inside individual cells.
+    </p>
+    <label for="sheetData">Google Sheets data (tab-separated)</label>
+    <textarea id="sheetData"
+      placeholder="id&#9;subject&#9;question&#9;optionA&#9;optionB&#9;optionC&#9;optionD&#9;answer&#9;explanation"></textarea>
+
+    <label for="existingIds">
+      Existing question IDs (optional, one ID per line)
+    </label>
+    <textarea id="existingIds"
+      placeholder="BIO_001&#10;CHEM_001&#10;GK_001"></textarea>
+    <p class="note">
+      Add IDs already present in questions.js to detect conflicts
+      with older questions. This tool cannot read your GitHub
+      file automatically.
+    </p>
+    <button id="validateBtn" class="gold">Validate & Generate</button>
+    <button id="clearBtn" class="secondary">Clear inputs</button>
+  </section>
+
+  <section class="panel">
+    <h2>Step 2 — Validation report</h2>
+    <p id="status">Paste your data, then select Validate & Generate.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Step 3 — Generated JavaScript objects</h2>
+    <p class="note">
+      Copy this output into the existing ACADEX_QUESTIONS array.
+      Do not replace the entire questions.js file.
+    </p>
+    <textarea id="output" readonly
+      placeholder="Generated code will appear here."></textarea>
+    <button id="copyBtn">Copy generated code</button>
+    <button id="downloadBtn" class="secondary">Download .js file</button>
+  </section>
+</main>
+
+<footer>ACADEX • Free MCQ Import Tool</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const requiredHeaders = [
+    "id", "subject", "question", "optionA", "optionB",
+    "optionC", "optionD", "answer", "explanation"
+  ];
+
+  let generated = "";
+
+  function report(message, isError) {
+    $("status").textContent = message;
+    $("status").className = isError ? "error" : "ok";
+  }
+
+  function parseTSV(text) {
+    // Google Sheets copy uses tabs between cells and newlines
+    // between rows. Newlines inside cells are not supported.
+    return text.replace(/\r/g, "")
+      .split("\n")
+      .filter(row => row.trim() !== "")
+      .map(row => row.split("\t").map(cell => cell.trim()));
+  }
+
+  function validate() {
+    generated = "";
+    $("output").value = "";
+
+    const raw = $("sheetData").value.trim();
+    if (!raw) {
+      report("ERROR: Paste your Google Sheets data first.", true);
+      return;
+    }
+
+    const rows = parseTSV(raw);
+    const headers = rows[0].map(h => h.toLowerCase());
+
+    if (headers.length !== requiredHeaders.length ||
+        requiredHeaders.some((h, i) => headers[i] !== h)) {
+      report(
+        "ERROR: The first row must contain these 9 headers in order:\n" +
+        requiredHeaders.join("\t"),
+        true
+      );
+      return;
+    }
+
+    const existing = new Set(
+      $("existingIds").value.split(/\n/)
+        .map(x => x.trim()).filter(Boolean)
+    );
+    const seen = new Set(existing);
+    const errors = [];
+    const warnings = [];
+    const objects = [];
+
+    rows.slice(1).forEach((cells, index) => {
+      const rowNumber = index + 2;
+
+      if (cells.length !== 9) {
+        errors.push(
+          "Row " + rowNumber + ": expected 9 columns, found " +
+          cells.length + ". Check tabs and line breaks."
+        );
+        return;
+      }
+
+      const [
+        id, subject, question, optionA, optionB,
+        optionC, optionD, answerRaw, explanation
+      ] = cells;
+
+      const answer = answerRaw.toUpperCase();
+      const options = [optionA, optionB, optionC, optionD];
+
+      if ([id, subject, question, explanation, ...options]
+          .some(value => !value)) {
+        errors.push("Row " + rowNumber + ": one or more fields are empty.");
+        return;
+      }
+
+      if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+        errors.push(
+          "Row " + rowNumber + ": ID may contain only letters, numbers, _ or -."
+        );
+      }
+
+      if (seen.has(id)) {
+        errors.push("Row " + rowNumber + ": duplicate ID: " + id);
+      } else {
+        seen.add(id);
+      }
+
+      if (!["A", "B", "C", "D"].includes(answer)) {
+        errors.push("Row " + rowNumber + ": answer must be A, B, C or D.");
+      }
+
+      if (new Set(options.map(x => x.toLowerCase())).size !== 4) {
+        warnings.push("Row " + rowNumber + ": duplicate option text.");
+      }
+
+      if (question.length < 5) {
+        warnings.push("Row " + rowNumber + ": unusually short question.");
+      }
+
+      if (["A", "B", "C", "D"].includes(answer) &&
+          !errors.some(e => e.startsWith("Row " + rowNumber + ":"))) {
+        objects.push({
+          id,
+          subject,
+          question,
+          options,
+          answer: ["A", "B", "C", "D"].indexOf(answer),
+          explanation
+        });
+      }
+    });
+
+    if (rows.length < 2) {
+      errors.push("No question rows found below the header.");
+    }
+
+    if (errors.length) {
+      report(
+        "IMPORT BLOCKED — Fix these errors first:\n\n" +
+        errors.join("\n") +
+        (warnings.length ? "\n\nWarnings:\n" + warnings.join("\n") : ""),
+        true
+      );
+      return;
+    }
+
+    generated = objects.map(obj =>
+      "  " + JSON.stringify(obj, null, 2)
+        .split("\n").join("\n  ")
+    ).join(",\n");
+
+    $("output").value = generated;
+
+    report(
+      "VALIDATION PASSED\n" +
+      "Questions generated: " + objects.length + "\n" +
+      "Unique IDs checked against the IDs you supplied.\n" +
+      (warnings.length
+        ? "\nWarnings to review:\n" + warnings.join("\n")
+        : "No format warnings found.") +
+      "\n\nIMPORTANT: Format validation does not verify factual accuracy.",
+      false
+    );
+  }
+
+  $("validateBtn").addEventListener("click", validate);
+
+  $("clearBtn").addEventListener("click", function () {
+    $("sheetData").value = "";
+    $("existingIds").value = "";
+    $("output").value = "";
+    generated = "";
+    report("Inputs cleared. Paste your data to begin.", false);
+  });
+
+  $("copyBtn").addEventListener("click", async function () {
+    if (!generated) {
+      report("Generate valid code before copying.", true);
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(generated);
+      report("Generated code copied. You can paste it into questions.js.", false);
+    } catch (e) {
+      $("output").focus();
+      $("output").select();
+      report(
+        "Automatic copy was blocked by the browser. The output is selected; " +
+        "long-press and choose Copy.",
+        false
+      );
+    }
+  });
+
+  $("downloadBtn").addEventListener("click", function () {
+    if (!generated) {
+      report("Generate valid code before downloading.", true);
+      return;
+    }
+    const blob = new Blob([generated], {
+      type: "text/javascript;charset=utf-8"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "acadex-mcq-import.js";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>
