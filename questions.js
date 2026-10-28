@@ -363,7 +363,7 @@ window.ACADEX_QUESTIONS = [
     options: ["on", "at", "in", "for"],
     answer: 2,
     explanation: "The correct collocation is 'interested in'."
-  }
+  },
     {
     "id": "GK_001",
     "subject": "GK",
